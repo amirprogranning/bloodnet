@@ -1,0 +1,422 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#b91c35" />
+    <title>BloodNet | شبکه هوشمند خون</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <div id="loginGate" class="login-gate">
+      <div class="login-card">
+        <div class="login-brand">
+          <div class="brand-mark">✚</div>
+          <div><b>BloodNet</b><small>ورود به شبکه هماهنگی خون</small></div>
+        </div>
+        <span class="eyebrow">سامانه مدیریت زنجیره تأمین خون</span>
+        <h1>به BloodNet خوش آمدید</h1>
+        <p class="login-sub">
+          برای ورود، نقش سازمانی خود را انتخاب و کد دسترسی همان نقش را وارد
+          کنید.
+        </p>
+        <form id="loginForm">
+          <label
+            >نقش کاربری<select id="loginRole" required>
+              <option value="admin">مدیریت سیستم</option>
+              <option value="center">مرکز تأمین و انتقال خون</option>
+              <option value="hospital">بیمارستان</option>
+            </select></label
+          ><label id="orgLabel" class="hidden"
+            >انتخاب مجموعه<select id="loginOrg"></select></label
+          ><label
+            >کد دسترسی<input
+              id="accessCode"
+              type="password"
+              placeholder="کد دسترسی نقش را وارد کنید"
+              autocomplete="off"
+              required
+          /></label>
+          <p id="loginError" class="login-error hidden">
+            کد دسترسی معتبر نیست.
+          </p>
+          <button class="primary-btn login-submit" type="submit">
+            ورود به سامانه <span>←</span>
+          </button>
+        </form>
+        <div class="login-hint">
+          <b>کدهای نسخه نمایشی</b><span>مدیریت: <code>ADMIN-2026</code></span
+          ><span>مرکز خون: <code>CENTER-2026</code></span
+          ><span>بیمارستان: <code>HOSP-2026</code></span>
+        </div>
+      </div>
+    </div>
+    <div class="app-shell">
+      <aside class="sidebar" id="sidebar">
+        <div class="brand">
+          <div class="brand-mark">✚</div>
+          <div><b>BloodNet</b><small>شبکه خون استان لرستان</small></div>
+        </div>
+        <div class="side-caption">منوی اصلی</div>
+        <nav id="nav">
+          <button class="nav-item active" data-page="dashboard">
+            <span>▦</span> نمای کلی</button
+          ><button class="nav-item" data-page="requests">
+            <span>▤</span> درخواست‌ها <i id="navRequestCount">0</i></button
+          ><button class="nav-item" data-page="inventory">
+            <span>▥</span> موجودی مراکز</button
+          ><button class="nav-item" data-page="hospitals">
+            <span>⌂</span> بیمارستان‌ها</button
+          ><button class="nav-item" data-page="donors">
+            <span>♡</span> اهداکنندگان</button
+          ><button class="nav-item" data-page="activity">
+            <span>◷</span> گزارش رویدادها
+          </button>
+        </nav>
+        <div class="sidebar-bottom">
+          <button class="nav-item" id="resetBtn">
+            <span>↻</span> بازنشانی داده‌های دمو
+          </button>
+        </div>
+      </aside>
+      <main class="main">
+        <header class="topbar">
+          <button class="icon-btn mobile-menu" id="menuBtn" aria-label="منو">
+            ☰
+          </button>
+          <div>
+            <div class="crumb">
+              شبکه خون استان <span>/</span> <b id="pageCrumb">نمای کلی</b>
+            </div>
+            <h1 id="pageTitle">نمای کلی سامانه</h1>
+          </div>
+          <div class="top-actions">
+            <button class="icon-btn" id="themeBtn" title="تغییر پوسته">
+              ☾
+            </button>
+            <div class="user-role" id="userRoleLabel">مدیر سیستم</div>
+            <button class="logout-btn" id="logoutBtn" type="button">
+              خروج
+            </button>
+          </div>
+        </header>
+        <div class="content">
+          <section class="page active" id="page-dashboard">
+            <div class="welcome">
+              <div>
+                <span class="eyebrow">داشبورد مدیریتی</span>
+                <h2>تصویر زنده‌ای از زنجیره تأمین خون</h2>
+                <p>
+                  درخواست‌ها، موجودی و روند تأمین را از یک نقطه مدیریت کنید.
+                </p>
+              </div>
+              <button class="primary-btn" data-action="new-request">
+                ＋ ثبت درخواست جدید
+              </button>
+            </div>
+            <div class="stats-grid" id="stats"></div>
+            <div class="dashboard-grid">
+              <div class="panel span-2">
+                <div class="panel-head">
+                  <div>
+                    <h3>درخواست‌های اخیر</h3>
+                    <p>آخرین درخواست‌های ثبت‌شده در سامانه</p>
+                  </div>
+                  <button class="text-btn" data-goto="requests">
+                    مشاهده همه ←
+                  </button>
+                </div>
+                <div class="table-wrap">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>شناسه</th>
+                        <th>بیمارستان</th>
+                        <th>فرآورده</th>
+                        <th>گروه خونی</th>
+                        <th>پیشرفت تأمین</th>
+                        <th>وضعیت</th>
+                      </tr>
+                    </thead>
+                    <tbody id="recentRows"></tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="panel">
+                <div class="panel-head">
+                  <div>
+                    <h3>موجودی به تفکیک فرآورده</h3>
+                    <p>واحدهای ثبت‌شده در مراکز</p>
+                  </div>
+                </div>
+                <div id="stockSummary" class="stock-summary"></div>
+              </div>
+              <div class="panel">
+                <div class="panel-head">
+                  <div>
+                    <h3>وضعیت درخواست‌ها</h3>
+                    <p>نمای کلی از درخواست‌های فعال</p>
+                  </div>
+                </div>
+                <div id="statusSummary" class="status-summary"></div>
+              </div>
+              <div class="panel span-2">
+                <div class="panel-head">
+                  <div>
+                    <h3>مراکز انتقال خون</h3>
+                    <p>مراکز موجود در داده‌های مسابقه</p>
+                  </div>
+                  <button class="text-btn" data-goto="inventory">
+                    مشاهده موجودی ←
+                  </button>
+                </div>
+                <div class="center-grid" id="centerCards"></div>
+              </div>
+            </div>
+          </section>
+          <section class="page" id="page-requests">
+            <div class="page-toolbar">
+              <div>
+                <h2>مدیریت درخواست‌ها</h2>
+                <p>ثبت، پیگیری و تعیین وضعیت درخواست بیمارستان‌ها</p>
+              </div>
+              <button class="primary-btn" data-action="new-request">
+                ＋ درخواست جدید
+              </button>
+            </div>
+            <div class="filters">
+              <input
+                id="requestSearch"
+                placeholder="جست‌وجوی شناسه یا بیمارستان…"
+              /><select id="statusFilter">
+                <option value="all">همه وضعیت‌ها</option>
+                <option value="complete">تأمین کامل</option>
+                <option value="partial">تأمین ناقص</option>
+                <option value="pending">در حال پیگیری</option>
+                <option value="cancelled">لغوشده</option></select
+              ><select id="urgencyFilter">
+                <option value="all">همه فوریت‌ها</option>
+                <option value="critical">بحرانی</option>
+                <option value="urgent">فوری</option>
+                <option value="planned">عادی</option>
+              </select>
+            </div>
+            <div class="panel">
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>شناسه</th>
+                      <th>بیمارستان</th>
+                      <th>فرآورده</th>
+                      <th>گروه</th>
+                      <th>درخواستی</th>
+                      <th>تأمین‌شده</th>
+                      <th>فوریت</th>
+                      <th>وضعیت</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody id="requestRows"></tbody>
+                </table>
+              </div>
+              <div class="empty hidden" id="emptyRequests">
+                درخواستی با این مشخصات پیدا نشد.
+              </div>
+            </div>
+          </section>
+          <section class="page" id="page-inventory">
+            <div class="page-toolbar">
+              <div>
+                <h2>موجودی مراکز</h2>
+              </div>
+              <div class="toolbar-note">
+                اولویت تخصیص: نزدیک‌ترین تاریخ انقضا (FEFO)
+              </div>
+            </div>
+            <div class="filters">
+              <input id="inventorySearch" placeholder="جست‌وجوی مرکز…" /><select
+                id="productFilter"
+              >
+                <option value="all">همه فرآورده‌ها</option>
+                <option value="red_cells">گلبول قرمز</option>
+                <option value="platelets">پلاکت</option>
+                <option value="plasma">پلاسما</option></select
+              ><select id="bloodFilter">
+                <option value="all">همه گروه‌های خونی</option>
+                <option>O+</option>
+                <option>O-</option>
+                <option>A+</option>
+                <option>A-</option>
+                <option>B+</option>
+                <option>B-</option>
+                <option>AB+</option>
+                <option>AB-</option>
+              </select>
+            </div>
+            <div class="stats-grid compact" id="inventoryStats"></div>
+            <div class="panel">
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>مرکز</th>
+                      <th>فرآورده</th>
+                      <th>گروه خونی</th>
+                      <th>تعداد واحد</th>
+                      <th>تاریخ انقضا</th>
+                      <th>وضعیت</th>
+                    </tr>
+                  </thead>
+                  <tbody id="inventoryRows"></tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+          <section class="page" id="page-hospitals">
+            <div class="page-toolbar">
+              <div>
+                <h2>بیمارستان‌ها</h2>
+                <p>فهرست بیمارستان‌های تعریف‌شده در کیت مسابقه</p>
+              </div>
+            </div>
+            <div class="hospital-grid" id="hospitalCards"></div>
+          </section>
+          <section class="page" id="page-donors">
+            <div class="page-toolbar">
+              <div>
+                <h2>اهداکنندگان شبیه‌سازی‌شده</h2>
+              </div>
+            </div>
+            <div class="filters">
+              <input
+                id="donorSearch"
+                placeholder="جست‌وجوی شناسه اهداکننده…"
+              /><select id="donorBloodFilter">
+                <option value="all">همه گروه‌ها</option>
+                <option>O+</option>
+                <option>O-</option>
+                <option>A+</option>
+                <option>A-</option>
+                <option>B+</option>
+                <option>B-</option>
+                <option>AB+</option>
+                <option>AB-</option>
+              </select>
+            </div>
+            <div class="stats-grid compact" id="donorStats"></div>
+            <div class="panel">
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>شناسه</th>
+                      <th>گروه خونی</th>
+                      <th>سن ثبت‌شده</th>
+                      <th>تعلیق در داده دمو</th>
+                      <th>دعوت‌های ۹۰ روز</th>
+                    </tr>
+                  </thead>
+                  <tbody id="donorRows"></tbody>
+                </table>
+              </div>
+              <div class="table-foot" id="donorFoot"></div>
+            </div>
+          </section>
+          <section class="page" id="page-activity">
+            <div class="page-toolbar">
+              <div>
+                <h2>گزارش رویدادها</h2>
+                <p>ردپای تغییر وضعیت‌ها و عملیات انجام‌شده در همین مرورگر</p>
+              </div>
+              <button class="secondary-btn" id="exportBtn">⇩ خروجی JSON</button>
+            </div>
+            <div class="panel">
+              <div id="activityList" class="activity-list"></div>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+    <div class="modal-backdrop hidden" id="modal">
+      <div class="modal">
+        <div class="modal-head">
+          <div>
+            <span class="eyebrow">فرم ثبت</span>
+            <h2 id="modalTitle">ثبت درخواست بیمارستان</h2>
+          </div>
+          <button class="icon-btn" id="closeModal">×</button>
+        </div>
+        <form id="requestForm">
+          <div class="form-grid">
+            <label class="full"
+              >بیمارستان<select id="hospitalSelect" required></select></label
+            ><label
+              >نوع فرآورده<select id="productSelect">
+                <option value="red_cells">گلبول قرمز</option>
+                <option value="platelets">پلاکت</option>
+                <option value="plasma">پلاسما</option>
+              </select></label
+            ><label
+              >گروه خونی گیرنده<select id="bloodSelect">
+                <option>O+</option>
+                <option>O-</option>
+                <option>A+</option>
+                <option>A-</option>
+                <option>B+</option>
+                <option>B-</option>
+                <option>AB+</option>
+                <option>AB-</option>
+              </select></label
+            ><label
+              >تعداد واحد<input
+                id="unitsInput"
+                type="number"
+                min="1"
+                max="500"
+                value="4"
+                required /></label
+            ><label
+              >فوریت<select id="urgencySelect">
+                <option value="critical">بحرانی</option>
+                <option value="urgent">فوری</option>
+                <option value="planned">عادی / برنامه‌ریزی‌شده</option>
+              </select></label
+            ><label class="full"
+              >توضیحات (اختیاری)<textarea
+                id="noteInput"
+                rows="2"
+                placeholder="توضیح کوتاه درباره درخواست…"
+              ></textarea>
+            </label>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="secondary-btn" id="cancelModal">
+              انصراف</button
+            ><button type="submit" class="primary-btn">
+              ثبت و بررسی موجودی
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div class="modal-backdrop hidden" id="detailModal">
+      <div class="modal detail-modal">
+        <div class="modal-head">
+          <div>
+            <span class="eyebrow">جزئیات درخواست</span>
+            <h2 id="detailTitle">درخواست</h2>
+          </div>
+          <button class="icon-btn" id="closeDetail">×</button>
+        </div>
+        <div id="detailBody"></div>
+      </div>
+    </div>
+    <div class="toast-wrap" id="toasts"></div>
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
